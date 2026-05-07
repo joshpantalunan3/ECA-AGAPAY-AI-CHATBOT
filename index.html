@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EXACT AI — Colleges of Asia</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --exact-navy: #0D1B3E;
+    --exact-gold: #C8952A;
+    --exact-gold-light: #F5D78E;
+    --exact-cream: #FAF7F2;
+    --exact-muted: #6B6B6B;
+    --exact-border: rgba(200, 149, 42, 0.18);
+    --exact-bubble-user: #0D1B3E;
+    --exact-bubble-bot: #FFFFFF;
+    --exact-shadow: 0 2px 16px rgba(13, 27, 62, 0.10);
+    --radius: 18px;
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--exact-cream);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--exact-navy);
+    padding: 0 1.5rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(200,149,42,0.3);
+    position: relative;
+    z-index: 10;
+  }
+
+  .logo-ring {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--exact-gold) 0%, #E8B84B 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--exact-navy);
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+  }
+
+  .header-text { flex: 1; }
+  .header-text h1 {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: #FFFFFF;
+    line-height: 1.2;
+  }
+  .header-text span {
+    font-size: 11px;
+    color: var(--exact-gold-light);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4ADE80;
+    box-shadow: 0 0 0 2px rgba(74,222,128,0.25);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+
+  /* ── CHAT AREA ── */
+  .chat-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    scroll-behavior: smooth;
+  }
+
+  .chat-wrapper::-webkit-scrollbar { width: 4px; }
+  .chat-wrapper::-webkit-scrollbar-thumb { background: var(--exact-border); border-radius: 99px; }
+
+  /* ── WELCOME ── */
+  .welcome {
+    text-align: center;
+    padding: 2rem 1rem 1rem;
+    animation: fadeSlideUp 0.6s ease both;
+  }
+  .welcome-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--exact-navy);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 1rem;
+    border: 2px solid var(--exact-gold);
+  }
+  .welcome-icon svg { width: 30px; height: 30px; fill: var(--exact-gold); }
+  .welcome h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--exact-navy);
+    margin-bottom: 6px;
+  }
+  .welcome p {
+    font-size: 14px;
+    color: var(--exact-muted);
+    line-height: 1.6;
+    max-width: 280px;
+    margin: 0 auto 1.25rem;
+  }
+
+  /* Suggestion chips */
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+  .chip {
+    background: #FFFFFF;
+    border: 1px solid var(--exact-border);
+    border-radius: 99px;
+    padding: 7px 14px;
+    font-size: 12.5px;
+    color: var(--exact-navy);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: var(--font-body);
+    font-weight: 400;
+  }
+  .chip:hover {
+    background: var(--exact-navy);
+    color: var(--exact-gold-light);
+    border-color: var(--exact-navy);
+    transform: translateY(-1px);
+  }
+
+  /* ── MESSAGES ── */
+  .msg-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    animation: fadeSlideUp 0.35s ease both;
+  }
+  .msg-row.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 500;
+  }
+  .avatar.bot {
+    background: var(--exact-navy);
+    color: var(--exact-gold);
+    font-family: var(--font-display);
+    font-size: 10px;
+  }
+  .avatar.user {
+    background: var(--exact-gold);
+    color: var(--exact-navy);
+    font-size: 13px;
+  }
+
+  .bubble {
+    max-width: 78%;
+    padding: 11px 15px;
+    border-radius: var(--radius);
+    font-size: 14.5px;
+    line-height: 1.65;
+    word-break: break-word;
+  }
+  .bubble.bot {
+    background: var(--exact-bubble-bot);
+    color: #1a1a1a;
+    border-bottom-left-radius: 5px;
+    box-shadow: var(--exact-shadow);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .bubble.user {
+    background: var(--exact-bubble-user);
+    color: #FFFFFF;
+    border-bottom-right-radius: 5px;
+  }
+
+  /* Typing indicator */
+  .typing {
+    display: flex; gap: 5px;
+    align-items: center;
+    padding: 14px 15px;
+  }
+  .typing span {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--exact-gold);
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0);} 30%{transform:translateY(-6px);} }
+
+  /* ── INPUT BAR ── */
+  .input-bar {
+    background: #FFFFFF;
+    border-top: 1px solid var(--exact-border);
+    padding: 12px 1rem;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+
+  textarea {
+    flex: 1;
+    border: 1.5px solid var(--exact-border);
+    border-radius: 14px;
+    padding: 10px 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: #1a1a1a;
+    resize: none;
+    min-height: 44px;
+    max-height: 120px;
+    line-height: 1.5;
+    outline: none;
+    background: var(--exact-cream);
+    transition: border-color 0.18s;
+    overflow-y: auto;
+  }
+  textarea:focus { border-color: var(--exact-gold); background: #FFFFFF; }
+  textarea::placeholder { color: #AAAAAA; }
+
+  .send-btn {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--exact-navy);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.18s;
+  }
+  .send-btn:hover { background: var(--exact-gold); }
+  .send-btn:hover svg { fill: var(--exact-navy); }
+  .send-btn:active { transform: scale(0.94); }
+  .send-btn svg { width: 18px; height: 18px; fill: #FFFFFF; }
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .send-btn:disabled:hover { background: var(--exact-navy); }
+  .send-btn:disabled:hover svg { fill: #FFFFFF; }
+
+  .disclaimer {
+    text-align: center;
+    font-size: 10.5px;
+    color: #BBBBBB;
+    padding: 4px 0 2px;
+  }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .bubble { max-width: 88%; }
+    header { padding: 0 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-ring">EX</div>
+  <div class="header-text">
+    <h1>EXACT AI Assistant</h1>
+    <span>Exact Colleges of Asia</span>
+  </div>
+  <div class="status-dot"></div>
+</header>
+
+<!-- CHAT AREA -->
+<div class="chat-wrapper" id="chatWrapper">
+
+  <!-- Welcome screen -->
+  <div class="welcome" id="welcome">
+    <div class="welcome-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+    </div>
+    <h2>Hello, I'm EXACT AI</h2>
+    <p>Your intelligent guide for everything about Exact Colleges of Asia. Ask me anything!</p>
+    <div class="suggestions" id="suggestions">
+      <button class="chip" onclick="sendSuggestion(this)">What is EXACT's mission?</button>
+      <button class="chip" onclick="sendSuggestion(this)">What programs are offered?</button>
+      <button class="chip" onclick="sendSuggestion(this)">What are EXACT's core values?</button>
+      <button class="chip" onclick="sendSuggestion(this)">Tell me about EXACT's vision</button>
+      <button class="chip" onclick="sendSuggestion(this)">How does EXACT support students?</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- INPUT BAR -->
+<div class="input-bar">
+  <textarea
+    id="userInput"
+    placeholder="Ask about EXACT Colleges of Asia..."
+    rows="1"
+    onkeydown="handleKey(event)"
+    oninput="autoResize(this)"
+  ></textarea>
+  <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send">
+    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+  </button>
+</div>
+<div class="disclaimer">EXACT AI may make mistakes. For official info, contact the school directly.</div>
+
+<script>
+const API_KEY = "AIzaSyDWSMjo1sz0UJFNQ2qRXsG_OOZCmGnnl3Y";
+const MODEL = "gemini-2.5-flash-lite-preview-06-17";
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+
+const SYSTEM_INSTRUCTION = `You are EXACT AI, the official AI assistant of Exact Colleges of Asia (EXACT) — a quality educational institution in the Philippines committed to excellence, advancement, courtesy, and tenacity.
+
+ABOUT EXACT:
+- Mission: Lead in providing quality education and training in compliance with CHED, TESDA, and DepEd standards, with commitment to continually improve the Quality Management System.
+- Vision: Be the Center of Excellence where education and training is translated to functional knowledge and skills for a progressive citizenry.
+- Core Values: EXcellence, Advancement, Courtesy, Tenacity (EXACT).
+- Programs: Elementary, High School, College, and Technical & Vocational Education.
+- Goals: Product-quality education, serve students worldwide, employee development, school growth, and nation building.
+- EXACT strives to be affordable yet high quality, with state-of-the-art facilities and world-class faculty.
+
+YOUR ROLE:
+- Help students, parents, and visitors learn about EXACT's programs, values, mission, and vision.
+- Answer questions about enrollment, school policies (in general), and student life to the best of your knowledge.
+- Be warm, professional, and encouraging — reflect EXACT's values of excellence and courtesy.
+- Promote EXACT's programs and achievements positively.
+
+RESTRICTIONS:
+- Do NOT discuss topics unrelated to education, EXACT, or student concerns (e.g., politics, adult content, harmful topics).
+- Do NOT provide specific personal data of staff or students.
+- Do NOT make up specific tuition fees, exact schedules, or contact details you are not certain about — instead, advise them to contact the school directly.
+- Do NOT engage in debates, controversial discussions, or anything that could embarrass the institution.
+- If asked something outside your knowledge or scope, politely redirect: "For the most accurate information, I recommend reaching out to the EXACT admissions office directly."
+- Keep responses concise, friendly, and helpful — typically 2–4 short paragraphs or bullet points.
+- Always respond in English unless the student writes in Filipino, in which case you may mix Filipino and English naturally (Taglish).
+- You may greet warmly and use encouraging language that reflects school spirit.`;
+
+let conversationHistory = [];
+let isLoading = false;
+
+const chatWrapper = document.getElementById("chatWrapper");
+const userInput = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
+
+function autoResize(el) {
+  el.style.height = "auto";
+  el.style.height = Math.min(el.scrollHeight, 120) + "px";
+}
+
+function handleKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function hideWelcome() {
+  const w = document.getElementById("welcome");
+  if (w) { w.style.display = "none"; }
+}
+
+function addMessage(text, role) {
+  const row = document.createElement("div");
+  row.className = `msg-row ${role}`;
+
+  const avatar = document.createElement("div");
+  avatar.className = `avatar ${role}`;
+  avatar.textContent = role === "bot" ? "EX" : "👤";
+
+  const bubble = document.createElement("div");
+  bubble.className = `bubble ${role}`;
+  bubble.innerHTML = formatText(text);
+
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  chatWrapper.appendChild(row);
+  scrollToBottom();
+  return bubble;
+}
+
+function formatText(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/\n\n/g, "</p><p>")
+    .replace(/\n/g, "<br>")
+    .replace(/^/, "<p>").concat("</p>")
+    .replace(/•\s/g, "• ");
+}
+
+function addTyping() {
+  const row = document.createElement("div");
+  row.className = "msg-row bot";
+  row.id = "typingRow";
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar bot";
+  avatar.textContent = "EX";
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble bot";
+  bubble.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
+
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  chatWrapper.appendChild(row);
+  scrollToBottom();
+}
+
+function removeTyping() {
+  const t = document.getElementById("typingRow");
+  if (t) t.remove();
+}
+
+function scrollToBottom() {
+  chatWrapper.scrollTop = chatWrapper.scrollHeight;
+}
+
+function sendSuggestion(btn) {
+  userInput.value = btn.textContent;
+  sendMessage();
+}
+
+async function sendMessage() {
+  const text = userInput.value.trim();
+  if (!text || isLoading) return;
+
+  hideWelcome();
+  isLoading = true;
+  sendBtn.disabled = true;
+  userInput.value = "";
+  userInput.style.height = "auto";
+
+  addMessage(text, "user");
+
+  conversationHistory.push({ role: "user", parts: [{ text }] });
+
+  addTyping();
+
+  try {
+    const body = {
+      system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+      contents: conversationHistory,
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 800,
+        topP: 0.9
+      },
+      safetySettings: [
+        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_LOW_AND_ABOVE" },
+        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
+      ]
+    };
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+      const reply = data.candidates[0].content.parts[0].text;
+      conversationHistory.push({ role: "model", parts: [{ text: reply }] });
+      addMessage(reply, "bot");
+    } else if (data.error) {
+      addMessage(`Sorry, I encountered an issue: ${data.error.message}. Please try again.`, "bot");
+    } else {
+      addMessage("I'm sorry, I couldn't generate a response right now. Please try again.", "bot");
+    }
+
+  } catch (err) {
+    removeTyping();
+    addMessage("Network error. Please check your connection and try again.", "bot");
+    console.error(err);
+  }
+
+  isLoading = false;
+  sendBtn.disabled = false;
+  userInput.focus();
+}
+
+userInput.focus();
+</script>
+</body>
+</html>
